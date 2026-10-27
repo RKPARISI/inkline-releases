@@ -71,8 +71,14 @@
           <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="M6 11l6 6 6-6"/><path d="M4 21h16"/></svg>
           Download for Windows
         </a>
-        <span class="meta" id="ver">Windows 10 and 11 · free · updates itself</span>
-        <a class="meta" href="#other">Ubuntu or Mac?</a>
+        <a class="btn" id="dlMac" href="https://github.com/RKPARISI/inkline-releases/releases/latest/download/Inkline-mac.zip" style="background:var(--ink);color:var(--paper)">
+          <svg width="16" height="18" viewBox="0 0 16 20" aria-hidden="true" fill="currentColor"><path d="M13.2 10.6c0-2.4 2-3.6 2.1-3.6-1.1-1.7-2.9-1.9-3.5-1.9-1.5-.2-2.9.9-3.7.9-.8 0-1.9-.9-3.2-.8C3.2 5.2 1.7 6.2.9 7.6c-1.7 2.9-.4 7.3 1.2 9.7.8 1.2 1.8 2.5 3 2.4 1.2 0 1.7-.8 3.1-.8 1.5 0 1.9.8 3.2.8 1.3 0 2.2-1.2 3-2.4.9-1.4 1.3-2.7 1.3-2.8 0 0-2.5-1-2.5-3.9zM10.9 3.5c.7-.8 1.1-1.9 1-3-1 0-2.1.7-2.8 1.5-.6.7-1.2 1.8-1 2.9 1 .1 2.1-.6 2.8-1.4z"/></svg>
+          Download for Mac
+        </a>
+      </div>
+      <div class="cta" style="margin-top:12px">
+        <span class="meta" id="ver">Windows 10 and 11 · macOS 13 and later · free · updates itself</span>
+        <a class="meta" href="#other">Ubuntu?</a>
       </div>
     </div>
     <div class="shot" aria-label="The Inkline print window">
@@ -104,7 +110,9 @@
       <button type="button" id="copyLx" class="chip" style="cursor:pointer;background:transparent">Copy command</button>
       <p style="margin:10px 0 0">It asks for your password once, adds every printer ARIA shares (driverless, full options) and lets you pick a default. Run again to refresh, or add <code>--remove</code> to undo. <a href="inkline-linux.sh">View the script</a>.</p>
     </div>
-    <div class="note"><b>Mac.</b> No app needed either. Open System Settings → Printers &amp; Scanners → Add Printer, and pick the printer shown from ARIA (on the office network). It prints through ARIA with color, 2-sided and paper options.</div>
+    <div class="note"><b>Mac.</b> Download Inkline for Mac, open the zip, and open Inkline (it offers to move itself to Applications). It lives in the menu bar; in any app press ⌘P, open the <b>PDF</b> menu at the bottom left and choose <b>Print with Inkline</b>.
+      <p style="margin:10px 0 0"><b>First launch only:</b> Inkline isn't signed by Apple yet, so macOS stops it once. Open it, click Done, then go to System Settings → Privacy &amp; Security, scroll down and click <b>Open Anyway</b>. It opens normally after that and updates itself.</p>
+    </div>
   </section>
 
   <section class="wrap">
@@ -124,9 +132,10 @@
     .then(function (r) { return r.ok ? r.json() : null; })
     .then(function (rel) {
       if (!rel) return;
-      var a = (rel.assets || []).filter(function (x) { return x.name === 'InklineSetup.exe'; })[0];
       var v = String(rel.tag_name || '').replace(/^v/i, '');
-      document.getElementById('ver').textContent = 'Version ' + v + (a ? ' · ' + Math.round(a.size / 1024) + ' KB' : '') + ' · Windows 10 and 11 · updates itself';
+      var hasMac = (rel.assets || []).some(function (x) { return x.name === 'Inkline-mac.zip'; });
+      if (!hasMac) document.getElementById('dlMac').style.display = 'none';
+      document.getElementById('ver').textContent = 'Version ' + v + ' · Windows 10 and 11' + (hasMac ? ' · macOS 13 and later' : '') + ' · free · updates itself';
     })
     .catch(function () {});
 </script>
