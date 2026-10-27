@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Get Inkline</title>
+<meta name="description" content="Inkline: print from any app, then pick an office printer. Download the setup for Windows.">
+<link rel="icon" href="Inkline-256.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+  :root { --ink:#16213E; --cyan:#00A8E8; --cyan-d:#0090C8; --paper:#F4F1EA; --line:#E2DDD1; --muted:#5E667A; --text:#3C4760; --card:#FFFFFF; --soft:#EAE6DC; }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) { --ink:#EEF1F8; --paper:#121829; --line:#2A3350; --muted:#9AA6BF; --text:#C3CCDD; --card:#1A2238; --soft:#232C46; }
+  }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--paper); color:var(--ink); font-family:'IBM Plex Sans', system-ui, sans-serif; font-size:16px; line-height:1.55; }
+  .wrap { max-width:960px; margin:0 auto; padding:0 20px; }
+  header { padding:28px 0 0; }
+  .brand { display:flex; align-items:center; gap:12px; font-family:Sora, sans-serif; font-weight:700; font-size:20px; }
+  .hero { display:grid; grid-template-columns:minmax(0,1.1fr) minmax(0,0.9fr); gap:48px; align-items:center; padding:56px 0 40px; }
+  h1 { font-family:Sora, sans-serif; font-weight:700; font-size:clamp(34px, 6vw, 54px); line-height:1.08; letter-spacing:-0.02em; margin:0 0 16px; }
+  .lead { font-size:18px; color:var(--text); margin:0 0 28px; max-width:34em; }
+  .cta { display:flex; flex-wrap:wrap; align-items:center; gap:14px; }
+  .btn { display:inline-flex; align-items:center; gap:10px; min-height:52px; padding:0 26px; border-radius:14px; background:var(--cyan); color:#fff; text-decoration:none; font-family:Sora, sans-serif; font-weight:600; font-size:16px; }
+  .btn:hover { background:var(--cyan-d); }
+  .btn:focus-visible { outline:3px solid var(--ink); outline-offset:3px; }
+  .meta { font-size:14px; color:var(--muted); }
+  .shot { background:var(--card); border:1px solid var(--line); border-radius:20px; padding:22px; box-shadow:0 18px 40px rgba(22,33,62,0.12); }
+  .shot h3 { margin:0 0 4px; font-family:Sora, sans-serif; font-size:17px; }
+  .shot .sub { font-size:13px; color:var(--muted); margin-bottom:14px; }
+  .p { display:flex; align-items:center; gap:12px; border:1.5px solid var(--line); border-radius:13px; padding:11px 13px; margin-bottom:8px; }
+  .p.on { border-color:var(--cyan); background:rgba(0,168,232,0.08); }
+  .p b { display:block; font-size:14.5px; }
+  .p small { color:var(--muted); font-size:12px; }
+  .dot { width:9px; height:9px; border-radius:50%; background:#1F9D55; flex:none; }
+  .tag { margin-left:auto; font-size:11.5px; font-weight:600; color:#0B7FB3; background:rgba(0,168,232,0.12); border-radius:7px; padding:2px 8px; }
+  .chips { display:flex; gap:8px; margin-top:12px; flex-wrap:wrap; }
+  .chip { font-size:12.5px; border:1px solid var(--line); border-radius:15px; padding:4px 11px; color:var(--text); }
+  section { padding:28px 0; }
+  h2 { font-family:Sora, sans-serif; font-size:24px; margin:0 0 18px; }
+  .steps { display:grid; grid-template-columns:repeat(3, minmax(0,1fr)); gap:16px; counter-reset:s; }
+  .step { background:var(--card); border:1px solid var(--line); border-radius:16px; padding:20px; }
+  .step::before { counter-increment:s; content:counter(s); display:inline-flex; width:30px; height:30px; border-radius:9px; background:var(--soft); align-items:center; justify-content:center; font-family:Sora, sans-serif; font-weight:700; margin-bottom:10px; }
+  .step b { display:block; margin-bottom:4px; }
+  .step p { margin:0; color:var(--text); font-size:15px; }
+  .grid2 { display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:16px; }
+  .note { background:var(--card); border:1px solid var(--line); border-radius:16px; padding:20px; color:var(--text); font-size:15px; }
+  .note b { color:var(--ink); }
+  code { font-family:Consolas, 'Cascadia Mono', monospace; font-size:13.5px; background:var(--soft); padding:2px 6px; border-radius:6px; word-break:break-all; }
+  a { color:#0B7FB3; }
+  footer { padding:30px 0 40px; color:var(--muted); font-size:13px; border-top:1px solid var(--line); margin-top:20px; }
+  @media (max-width: 760px) { .hero { grid-template-columns:1fr; gap:28px; padding-top:36px; } .steps, .grid2 { grid-template-columns:1fr; } }
+</style>
+</head>
+<body>
+<header class="wrap">
+  <div class="brand">
+    <svg width="36" height="36" viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#16213E"/><rect x="22" y="10" width="20" height="19" rx="2" fill="#F4F1EA"/><path d="M26 16 H38 M26 20.5 H36" stroke="#16213E" stroke-width="1.6" stroke-linecap="round"/><rect x="11" y="27" width="42" height="22" rx="5" fill="#F4F1EA"/><rect x="20" y="49" width="24" height="5" rx="1.5" fill="#C9C3B5"/><path d="M32 29 C32 29 25.5 36.5 25.5 41 A6.5 6.5 0 0 0 38.5 41 C38.5 36.5 32 29 32 29 Z" fill="#00A8E8"/></svg>
+    Inkline
+  </div>
+</header>
+
+<main>
+  <div class="wrap hero">
+    <div>
+      <h1>One printer list for every desk.</h1>
+      <p class="lead">Print from any app to Inkline, then pick an office printer. Preview, copies, color and 2-sided in one simple window. No drivers, no passwords.</p>
+      <div class="cta">
+        <a class="btn" id="dl" href="https://github.com/RKPARISI/inkline-releases/releases/latest/download/InklineSetup.exe">
+          <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="M6 11l6 6 6-6"/><path d="M4 21h16"/></svg>
+          Download for Windows
+        </a>
+        <span class="meta" id="ver">Windows 10 and 11 · free · updates itself</span>
+      </div>
+    </div>
+    <div class="shot" aria-label="The Inkline print window">
+      <h3>Print with Inkline</h3>
+      <div class="sub">Quote 1042.pdf · 3 pages</div>
+      <div class="p on"><span class="dot"></span><div><b>Toshiba eSTUDIO2551C</b><small>via ARIA</small></div><span class="tag">Server</span></div>
+      <div class="p"><span class="dot"></span><div><b>Brother MFC 9340CDW</b><small>via ARIA</small></div><span class="tag">Server</span></div>
+      <div class="chips"><span class="chip">Copies 2</span><span class="chip">B&amp;W</span><span class="chip">2-sided</span><span class="chip">Pages 1-3</span></div>
+    </div>
+  </div>
+
+  <section class="wrap">
+    <h2>Set up a PC in a minute</h2>
+    <div class="steps">
+      <div class="step"><b>Download and open</b><p>Run InklineSetup.exe. If Windows asks about the download, choose Keep / Run anyway.</p></div>
+      <div class="step"><b>Click Install Inkline</b><p>Approve the one Windows prompt. Inkline adds its printer and finds the office printers.</p></div>
+      <div class="step"><b>Print to Inkline</b><p>From Chrome, Word or anything else. Pick a printer in the window that opens, press Print.</p></div>
+    </div>
+  </section>
+
+  <section class="wrap grid2">
+    <div class="note"><b>Peer to peer out of the box.</b> A PC with a USB printer can share it into Inkline from the same app. Have a server host it for better control: ARIA serves the office printers.</div>
+    <div class="note"><b>Stays up to date.</b> Installed copies check for new versions every few hours and update themselves. Away from the office? Print later, and it prints when you're back.</div>
+  </section>
+
+  <section class="wrap">
+    <div class="note"><b>On a Mac?</b> The office printers are shared by ARIA with AirPrint-style printing. Open System Settings → Printers &amp; Scanners → Add Printer, and pick the printer listed from ARIA.</div>
+    <p class="meta" style="margin-top:14px">Direct link to the newest setup: <code>https://github.com/RKPARISI/inkline-releases/releases/latest/download/InklineSetup.exe</code> · <a href="https://github.com/RKPARISI/inkline-releases/releases">all versions</a></p>
+  </section>
+</main>
+
+<footer class="wrap">Inkline · PoshHaus</footer>
+
+<script>
+  // show the current version and file size (public GitHub API; the link above works without it)
+  fetch('https://api.github.com/repos/RKPARISI/inkline-releases/releases/latest')
+    .then(function (r) { return r.ok ? r.json() : null; })
+    .then(function (rel) {
+      if (!rel) return;
+      var a = (rel.assets || []).filter(function (x) { return x.name === 'InklineSetup.exe'; })[0];
+      var v = String(rel.tag_name || '').replace(/^v/i, '');
+      document.getElementById('ver').textContent = 'Version ' + v + (a ? ' · ' + Math.round(a.size / 1024) + ' KB' : '') + ' · Windows 10 and 11 · updates itself';
+    })
+    .catch(function () {});
+</script>
+</body>
+</html>
