@@ -72,6 +72,7 @@
           Download for Windows
         </a>
         <span class="meta" id="ver">Windows 10 and 11 · free · updates itself</span>
+        <a class="meta" href="#other">Ubuntu or Mac?</a>
       </div>
     </div>
     <div class="shot" aria-label="The Inkline print window">
@@ -97,8 +98,16 @@
     <div class="note"><b>Stays up to date.</b> Installed copies check for new versions every few hours and update themselves. Away from the office? Print later, and it prints when you're back.</div>
   </section>
 
+  <section class="wrap grid2" id="other">
+    <div class="note"><b>Ubuntu / Linux desktop.</b> No app needed: CUPS prints straight to ARIA. Open a terminal and run:
+      <p style="margin:10px 0 6px"><code id="lx">wget -qO- https://rkparisi.github.io/inkline-releases/inkline-linux.sh | bash</code></p>
+      <button type="button" id="copyLx" class="chip" style="cursor:pointer;background:transparent">Copy command</button>
+      <p style="margin:10px 0 0">It asks for your password once, adds every printer ARIA shares (driverless, full options) and lets you pick a default. Run again to refresh, or add <code>--remove</code> to undo. <a href="inkline-linux.sh">View the script</a>.</p>
+    </div>
+    <div class="note"><b>Mac.</b> No app needed either. Open System Settings → Printers &amp; Scanners → Add Printer, and pick the printer shown from ARIA (on the office network). It prints through ARIA with color, 2-sided and paper options.</div>
+  </section>
+
   <section class="wrap">
-    <div class="note"><b>On a Mac?</b> The office printers are shared by ARIA with AirPrint-style printing. Open System Settings → Printers &amp; Scanners → Add Printer, and pick the printer listed from ARIA.</div>
     <p class="meta" style="margin-top:14px">Direct link to the newest setup: <code>https://github.com/RKPARISI/inkline-releases/releases/latest/download/InklineSetup.exe</code> · <a href="https://github.com/RKPARISI/inkline-releases/releases">all versions</a></p>
   </section>
 </main>
@@ -106,6 +115,10 @@
 <footer class="wrap">Inkline · PoshHaus</footer>
 
 <script>
+  document.getElementById('copyLx').addEventListener('click', function () {
+    var t = document.getElementById('lx').textContent, b = this;
+    (navigator.clipboard ? navigator.clipboard.writeText(t) : Promise.reject()).then(function () { b.textContent = 'Copied'; setTimeout(function () { b.textContent = 'Copy command'; }, 1500); }, function () {});
+  });
   // show the current version and file size (public GitHub API; the link above works without it)
   fetch('https://api.github.com/repos/RKPARISI/inkline-releases/releases/latest')
     .then(function (r) { return r.ok ? r.json() : null; })
