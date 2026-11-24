@@ -268,7 +268,20 @@ var qrcode=function(){function i(t,r){function a(t,r){g=function(t){for(var r=ne
 
     // text block: big line, then small lines, centered vertically in the space left
     const items = [];
-    if (l1) items.push({ t: l1, max: 64, min: 22, w: '700' });
+    if (l1) {
+      // a long name goes on two balanced lines instead of shrinking to nothing
+      ctx.font = '700 30px "Segoe UI", system-ui, sans-serif';
+      const words = l1.split(/\s+/);
+      if (ctx.measureText(l1).width > textW && words.length > 1) {
+        let best = 1, bestW = Infinity;
+        for (let i = 1; i < words.length; i++) {
+          const w = Math.max(ctx.measureText(words.slice(0, i).join(' ')).width, ctx.measureText(words.slice(i).join(' ')).width);
+          if (w < bestW) { bestW = w; best = i; }
+        }
+        items.push({ t: words.slice(0, best).join(' '), max: 40, min: 18, w: '700' });
+        items.push({ t: words.slice(best).join(' '), max: 40, min: 18, w: '700' });
+      } else items.push({ t: l1, max: 64, min: 22, w: '700' });
+    }
     lines.forEach(t => items.push({ t, max: 30, min: 16, w: '500' }));
     if (!items.length && !(kind === 'qr' && code) && !(kind === 'bar' && code)) {
       ctx.fillStyle = '#c8c8c8'; ctx.textAlign = 'center'; ctx.font = '500 22px system-ui, sans-serif'; ctx.fillText('Type a label…', W / 2, H / 2); ctx.fillStyle = '#000';
@@ -437,6 +450,24 @@ var qrcode=function(){function i(t,r){function a(t,r){g=function(t){for(var r=ne
     if (await printCanvas(render(), copies, copies > 1 ? 'Printed ' + copies + ' labels.' : 'Printed.')) remember();
   };
   $('testBtn').onclick = () => printCanvas(testCanvas(), 1, 'Test label printed. Adjust and print again until the box sits just inside the label.');
+
+  // A product handed over in the link (e.g. from the CRM's "Print label" action):
+  //   ?name=...&maker=...&upc=...&sku=...&copies=2   -> name on top, maker under it, UPC barcode (or the SKU's)
+  (function fromLink() {
+    const q = new URLSearchParams(location.search);
+    if (!q.has('name') && !q.has('sku') && !q.has('upc')) return;
+    const maker = (q.get('maker') || '').trim();
+    let name = (q.get('name') || '').trim();
+    if (maker && name.toLowerCase().startsWith(maker.toLowerCase() + ' ')) name = name.slice(maker.length + 1);   // drop the maker repeated in the name
+    const upc = (q.get('upc') || '').replace(/\D/g, '');
+    const sku = (q.get('sku') || '').trim();
+    const codeVal = /^\d{11,12}$/.test(upc) ? upc : sku;
+    load({ l1: name, l2: maker, kind: codeVal ? 'bar' : 'none', code: codeVal, align: 'center' });
+    const n = parseInt(q.get('copies') || '1', 10);
+    copies = isNaN(n) ? 1 : Math.min(50, Math.max(1, n)); $('copies').textContent = copies;
+    history.replaceState(null, '', location.pathname);   // a reload doesn't bring the product back
+    say('Ready: check the label and tap Print.');
+  })();
 
   if (!navigator.bluetooth) $('noBt').classList.add('show');
   window.inklineLabels = { job: () => job(render(), copies), test: () => job(testCanvas(), 1) };   // for checking from a computer
