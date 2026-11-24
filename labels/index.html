@@ -288,7 +288,7 @@ var qrcode=function(){function i(t,r){function a(t,r){g=function(t){for(var r=ne
       const bars = barcode(code);
       const modules = bars.reduce((a, b) => a + b[0], 0);
       const m = Math.max(1, Math.floor((W - pad * 2) / modules));
-      const bw = modules * m, bh = 84;
+      const bw = modules * m, bh = 64;   // 8 mm tall: plenty for a handheld scanner, and leaves room for the name
       let x = Math.floor((W - bw) / 2); const y = H - pad - bh - 20;
       bars.forEach(b => { if (b[1]) ctx.fillRect(x, y, b[0] * m, bh); x += b[0] * m; });
       ctx.textAlign = 'center'; fitFont(ctx, bars.text, W - pad * 2, 20, 12, '600'); ctx.fillText(bars.text, W / 2, H - pad - 9);
@@ -298,18 +298,31 @@ var qrcode=function(){function i(t,r){function a(t,r){g=function(t){for(var r=ne
     // text block: big line, then small lines, centered vertically in the space left
     const items = [];
     if (l1) {
-      // a long name goes on two balanced lines instead of shrinking to nothing
-      ctx.font = '700 30px "Segoe UI", system-ui, sans-serif';
-      const words = l1.split(/\s+/);
-      if (ctx.measureText(l1).width > textW && words.length > 1) {
-        let best = 1, bestW = Infinity;
-        for (let i = 1; i < words.length; i++) {
-          const w = Math.max(ctx.measureText(words.slice(0, i).join(' ')).width, ctx.measureText(words.slice(i).join(' ')).width);
-          if (w < bestW) { bestW = w; best = i; }
-        }
-        items.push({ t: words.slice(0, best).join(' '), max: 40, min: 18, w: '700' });
-        items.push({ t: words.slice(best).join(' '), max: 40, min: 18, w: '700' });
-      } else items.push({ t: l1, max: 64, min: 22, w: '700' });
+      // the name goes on 1, 2 or 3 balanced lines, whichever lets it print biggest in the space left
+      const words = l1.split(/\s+/), smallH = lines.length * 20 * 1.12, roomH = textBottom - textTop - smallH;
+      const wid = s => { ctx.font = '700 30px "Segoe UI", system-ui, sans-serif'; return ctx.measureText(s).width; };
+      const split = k => {   // the k-line split with the narrowest widest line
+        const n = words.length; let best = null, bestW = Infinity;
+        const tryCut = cuts => {
+          const parts = []; let s = 0; cuts.concat(n).forEach(c => { parts.push(words.slice(s, c).join(' ')); s = c; });
+          const w = Math.max(...parts.map(wid)); if (w < bestW) { bestW = w; best = parts; }
+        };
+        if (k === 1) tryCut([]);
+        else if (k === 2) for (let i = 1; i < n; i++) tryCut([i]);
+        else for (let i = 1; i < n - 1; i++) for (let j = i + 1; j < n; j++) tryCut([i, j]);
+        return best;
+      };
+      let pick = null;
+      for (let k = 1; k <= Math.min(3, words.length); k++) {
+        const parts = split(k);
+        let px = Math.min(...parts.map(p => fitFont(ctx, p, textW, k === 1 ? 64 : 44, 14, '700')));
+        px = Math.max(14, Math.min(px, Math.floor(roomH / (k * 1.12))));
+        ctx.font = '700 ' + px + 'px "Segoe UI", system-ui, sans-serif';
+        const fits = parts.every(p => ctx.measureText(p).width <= textW);
+        const score = px - (fits ? 0 : 100);
+        if (!pick || score > pick.score) pick = { parts, px, score };
+      }
+      pick.parts.forEach(t => items.push({ t, max: pick.px, min: pick.px, w: '700' }));
     }
     lines.forEach(t => items.push({ t, max: 30, min: 16, w: '500' }));
     if (!items.length && !(shown === 'qr' && code) && !(shown === 'bar' && code)) {
