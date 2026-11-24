@@ -121,6 +121,13 @@ var qrcode=function(){function i(t,r){function a(t,r){g=function(t){for(var r=ne
     </div>
   </div>
 
+  <div class="card" id="batchCard" style="display:none">
+    <label class="f" style="margin-top:0" id="batchTitle">Labels to print</label>
+    <div class="recent" id="batch" style="flex-wrap:wrap;overflow:visible"></div>
+    <p class="small" style="margin:8px 2px 0">Tap one to check it. Print sends all of them, one of each.
+      <button class="link" id="batchClear" style="margin-left:6px">Clear list</button></p>
+  </div>
+
   <div class="card" id="recentCard" style="display:none">
     <label class="f" style="margin-top:0">Print again</label>
     <div class="recent" id="recent"></div>
@@ -443,8 +450,53 @@ var qrcode=function(){function i(t,r){function a(t,r){g=function(t){for(var r=ne
     list.unshift(r); store.set('recent', list.slice(0, 12)); showRecent();
   }
 
+  // ---- a list of products to print in one go (CRM list > Actions > Print labels)
+  let batch = null, batchBusy = false;
+  function product(name, maker, upc, sku) {   // a CRM product -> label: name, maker under it, UPC barcode (or the SKU's)
+    maker = (maker || '').trim(); name = (name || '').trim();
+    if (maker && name.toLowerCase().startsWith(maker.toLowerCase() + ' ')) name = name.slice(maker.length + 1);   // drop the maker repeated in the name
+    const u = (upc || '').replace(/\D/g, ''), s = (sku || '').trim();
+    const codeVal = /^\d{11,12}$/.test(u) ? u : s;
+    return { l1: name, l2: maker, kind: codeVal ? 'bar' : 'none', code: codeVal, align: 'center' };
+  }
+  function showBatch(active) {
+    $('batchCard').style.display = batch ? '' : 'none';
+    $('print').textContent = batch ? 'Print all ' + batch.length + ' labels' : 'Print';
+    if (!batch) return;
+    $('batchTitle').textContent = batch.length + ' labels to print';
+    const box = $('batch'); box.innerHTML = '';
+    batch.forEach((r, i) => {
+      const b = document.createElement('button');
+      b.textContent = (r.done ? '✓ ' : '') + (r.l1 || r.code || 'Label');
+      if (i === active) b.style.borderColor = 'var(--cyan)';
+      b.onclick = () => { load(r); showBatch(i); };
+      box.appendChild(b);
+    });
+  }
+  $('batchClear').onclick = () => { batch = null; showBatch(); say(''); };
+
+  async function printBatch() {
+    const keep = current();
+    for (let i = 0; i < batch.length; i++) {
+      if (batch[i].done) continue;
+      load(batch[i]); showBatch(i);
+      if (!(await printCanvas(render(), 1, 'Printed ' + (i + 1) + ' of ' + batch.length + '.'))) { showBatch(i); return; }   // stopped: Print again carries on from here
+      batch[i].done = true;
+      say('Printing ' + (i + 2 > batch.length ? batch.length : i + 2) + ' of ' + batch.length + '…');
+    }
+    showBatch(); load(keep);
+    say('Printed all ' + batch.length + ' labels.', 'good');
+    batch.forEach(r => delete r.done);
+  }
+
   $('conn').onclick = () => connect();
   $('print').onclick = async () => {
+    if (batch) {
+      if (batchBusy) return;
+      batchBusy = true;
+      try { await printBatch(); } finally { batchBusy = false; }
+      return;
+    }
     const r = current();
     if (!r.l1.trim() && !r.l2.trim() && !((r.kind === 'qr' || r.kind === 'bar') && r.code.trim()) && r.kind !== 'date') { say('Type something for the label first.', 'bad'); $('l1').focus(); return; }
     if (await printCanvas(render(), copies, copies > 1 ? 'Printed ' + copies + ' labels.' : 'Printed.')) remember();
@@ -455,14 +507,16 @@ var qrcode=function(){function i(t,r){function a(t,r){g=function(t){for(var r=ne
   //   ?name=...&maker=...&upc=...&sku=...&copies=2   -> name on top, maker under it, UPC barcode (or the SKU's)
   (function fromLink() {
     const q = new URLSearchParams(location.search);
+    if (q.has('items')) {   // ?items=[[name, maker, upc, sku], ...]
+      try {
+        const list = JSON.parse(q.get('items')).map(a => product(a[0], a[1], a[2], a[3])).filter(r => r.l1 || r.code);
+        if (list.length) { batch = list; load(batch[0]); showBatch(0); say('Ready: ' + list.length + ' labels. Tap Print to send them all.'); }
+      } catch (e) { say('That list of labels didn\'t come through. Try again from the CRM.', 'bad'); }
+      history.replaceState(null, '', location.pathname);
+      return;
+    }
     if (!q.has('name') && !q.has('sku') && !q.has('upc')) return;
-    const maker = (q.get('maker') || '').trim();
-    let name = (q.get('name') || '').trim();
-    if (maker && name.toLowerCase().startsWith(maker.toLowerCase() + ' ')) name = name.slice(maker.length + 1);   // drop the maker repeated in the name
-    const upc = (q.get('upc') || '').replace(/\D/g, '');
-    const sku = (q.get('sku') || '').trim();
-    const codeVal = /^\d{11,12}$/.test(upc) ? upc : sku;
-    load({ l1: name, l2: maker, kind: codeVal ? 'bar' : 'none', code: codeVal, align: 'center' });
+    load(product(q.get('name'), q.get('maker'), q.get('upc'), q.get('sku')));
     const n = parseInt(q.get('copies') || '1', 10);
     copies = isNaN(n) ? 1 : Math.min(50, Math.max(1, n)); $('copies').textContent = copies;
     history.replaceState(null, '', location.pathname);   // a reload doesn't bring the product back
