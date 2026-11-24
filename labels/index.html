@@ -297,6 +297,7 @@ var qrcode=function(){function i(t,r){function a(t,r){g=function(t){for(var r=ne
 
     // text block: big line, then small lines, centered vertically in the space left
     const items = [];
+    let namePx = 0;
     if (l1) {
       // the name goes on 1, 2 or 3 balanced lines, whichever lets it print biggest in the space left
       const words = l1.split(/\s+/), smallH = lines.length * 20 * 1.12, roomH = textBottom - textTop - smallH;
@@ -323,8 +324,10 @@ var qrcode=function(){function i(t,r){function a(t,r){g=function(t){for(var r=ne
         if (!pick || score > pick.score) pick = { parts, px, score };
       }
       pick.parts.forEach(t => items.push({ t, max: pick.px, min: pick.px, w: '700' }));
+      namePx = pick.px;
     }
-    lines.forEach(t => items.push({ t, max: 30, min: 16, w: '500' }));
+    const smallMax = namePx ? Math.max(14, Math.min(30, Math.round(namePx * 0.8))) : 30;   // never bigger than the name
+    lines.forEach(t => items.push({ t, max: smallMax, min: Math.min(16, smallMax), w: '500' }));
     if (!items.length && !(shown === 'qr' && code) && !(shown === 'bar' && code)) {
       ctx.fillStyle = '#c8c8c8'; ctx.textAlign = 'center'; ctx.font = '500 22px system-ui, sans-serif'; ctx.fillText('Type a label…', W / 2, H / 2); ctx.fillStyle = '#000';
       return c;
