@@ -1,0 +1,11 @@
+{
+  "name": "Inkline Labels",
+  "short_name": "Labels",
+  "description": "Print 2 x 1 in labels to the CLABEL printer over Bluetooth.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#F4F1EA",
+  "theme_color": "#16213E",
+  "icons": [{ "src": "../Inkline-256.png", "sizes": "256x256", "type": "image/png", "purpose": "any" }]
+}
