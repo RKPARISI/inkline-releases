@@ -272,7 +272,7 @@ var qrcode=function(){function i(t,r){function a(t,r){g=function(t){for(var r=ne
     note = '';
     if (kind === 'bar' && code) {
       const mods = barcode(code).reduce((a, b) => a + b[0], 0) + 20;
-      if (mods > W - pad * 2 + 20) { shown = 'qr'; note = 'This code is too long for a barcode on a 2 in label, so it prints as a QR code.'; }
+      if (mods > W - pad * 2 + 20) { shown = 'qr'; lines.push(code); note ='This code is too long for a barcode on a 2 in label, so it prints as a QR code.'; }
       else if (Math.floor((W - pad * 2) / mods) < 2) note = 'Long code: the bars print very thin. Scan the first label to check it reads.';
     }
 
