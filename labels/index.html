@@ -174,7 +174,7 @@ var qrcode=function(){function i(t,r){function a(t,r){g=function(t){for(var r=ne
   };
   let cfg = Object.assign({}, DEFAULTS, store.get('cfg', {}));
   let kind = 'none', align = store.get('align', 'center'), copies = 1;
-  let device = null, chr = null, note = '';
+  let device = null, chr = null, note = '', fit = {};
 
   // ---- UI wiring
   function seg(id, onPick, value) {
@@ -326,9 +326,10 @@ var qrcode=function(){function i(t,r){function a(t,r){g=function(t){for(var r=ne
     let y = textTop + Math.max(0, (avail - total) / 2);
     ctx.textAlign = align === 'center' ? 'center' : 'left';
     const x = align === 'center' ? textX + textW / 2 : textX;
+    fit = { cut: false, overflow: total > avail + 1, namePx: items.length ? items[0].px : 0, lines: items.length };
     items.forEach(it => {
       ctx.font = it.w + ' ' + it.px + 'px "Segoe UI", system-ui, -apple-system, sans-serif';
-      let t = it.t; while (ctx.measureText(t).width > textW && t.length > 1) t = t.slice(0, -2) + '…';
+      let t = it.t; while (ctx.measureText(t).width > textW && t.length > 1) { t = t.slice(0, -2) + '…'; fit.cut = true; }
       ctx.fillText(t, x, y + it.px * 0.56); y += it.px * 1.12;
     });
     return c;
@@ -551,7 +552,10 @@ var qrcode=function(){function i(t,r){function a(t,r){g=function(t){for(var r=ne
   })();
 
   if (!navigator.bluetooth) $('noBt').classList.add('show');
-  window.inklineLabels = { job: () => job(render(), copies), test: () => job(testCanvas(), 1) };   // for checking from a computer
+  window.inklineLabels = {   // for checking from a computer
+    job: () => job(render(), copies), test: () => job(testCanvas(), 1),
+    check: a => { const r = product(a[0], a[1], a[2], a[3]); load(r); render(); return Object.assign({ name: r.l1, note }, fit); }
+  };
   showRecent(); draw(); reconnectSilently();
   // keep a copy on the phone so the page opens with no Wi-Fi, and can go on the home screen as an app
   if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('sw.js').catch(() => {});
